@@ -20,7 +20,7 @@ class Quad
         ~Quad() = default;
         
         // accessors and mutators
-        Quad get() const;
+        static const double getTolerance();
         void set(const Quad&);
 
         // compound assignment operators
@@ -39,26 +39,25 @@ class Quad
         Quad operator+();
         Quad& operator++();
         Quad& operator--();
-        const Quad operator++(int);
-        const Quad operator--(int);
+        Quad operator++(int);
+        Quad operator--(int);
 
         // subscript overload 
         const double& operator[](size_t) const;
         double& operator[](size_t);
 
         // function overload
-        double& operator()() const;
-        double& operator()(size_t) const;
-        double& operator()(size_t, size_t) const;
-        double& operator()(size_t, size_t, size_t) const;
-        double& operator()(size_t, size_t, size_t, size_t) const;
+        double operator()() const;
+        double operator()(size_t) const;
+        double operator()(size_t, size_t) const;
+        double operator()(size_t, size_t, size_t) const;
+        double operator()(size_t, size_t, size_t, size_t) const;
 
         Quad absoluteValue() const;
+        Quad inverse() const;
 
     private:
-        std::array<double, 4> quad{};
-
-        
+        std::array<double, 4> quad{};        
 };
 
 // basic arithmetic binary operators
@@ -72,10 +71,10 @@ Quad operator-(const Quad&, const double&);
 Quad operator*(const Quad&, const double&);
 Quad operator/(const Quad&, const double&);
 
-double operator+(const double&, const Quad&);
-double operator-(const double&, const Quad&);
-double operator*(const double&, const Quad&);
-double operator/(const double&, const Quad&);
+Quad operator+(const double&, const Quad&);
+Quad operator-(const double&, const Quad&);
+Quad operator*(const double&, const Quad&);
+Quad operator/(const double&, const Quad&);
 
 // relational and equality operator overloads
 bool operator==(const Quad&, const Quad&);
