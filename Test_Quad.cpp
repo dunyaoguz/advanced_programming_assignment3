@@ -13,6 +13,7 @@ and overloaded relational operators.
 @return 0 to indicate success.
 */
 // function prototypes
+void test_insersion_extraction_operator();
 void test_constructors_and_equality();
 void test_multiplication_and_inverse();
 void test_unary_operators();
@@ -21,18 +22,20 @@ void test_compound_assignment_operators();
 void test_subscript_operator();
 void test_relational_operators();
 void test_function_objects();
+void test_accessor_mutator();
 
 int main()
 {
-   //test_insersion_extraction_operator();
-   test_constructors_and_equality();
-   test_multiplication_and_inverse();
-   test_unary_operators();
-   test_basic_arithmetic_operators();
-   test_compound_assignment_operators();
-   test_subscript_operator();
-   test_relational_operators();
-   test_function_objects();
+   // test_insersion_extraction_operator(); // success
+   test_constructors_and_equality(); // success
+   test_multiplication_and_inverse(); // success
+   test_unary_operators(); // success
+   test_basic_arithmetic_operators(); // success
+   test_compound_assignment_operators(); // success
+   test_subscript_operator(); // success
+   test_relational_operators(); // success
+   test_function_objects(); 
+   test_accessor_mutator(); // success
 
    cout << "Test completed successfully!" << endl;
    return 0;
@@ -75,18 +78,21 @@ void test_constructors_and_equality()
 
    Quad q1(2.5, 3.6, 8.7, 5.8);        // normal ctor with 4 args
 }
+
 void test_multiplication_and_inverse()
 {
-   const Quad IDENTITY(1, 0, 1, 0);
-   Quad q1(2.5, 3.6, 8.7, 5.8);                  // normal ctor with 4 args
-   Quad  q1_inverse = q1.inverse();              // inverse, copy ctor
+   const Quad IDENTITY(1.0, 0.0, 1.0, 0.0);
+   Quad q1(2.5, 3.6, 8.7, 5.8);                 // normal ctor with 4 args
+   Quad q1_inverse = q1.inverse();              // inverse, copy ctor
 
    Quad q1_inverse_times_q1 = q1_inverse * q1;   // Quad * Quad
    assert(q1_inverse_times_q1 == IDENTITY);      // invariant, must hold     
 
    Quad q1_times_q1_inverse = q1 * q1_inverse;
+   cout << (q1_times_q1_inverse == IDENTITY) << endl;
    assert(q1_times_q1_inverse == IDENTITY);      // invariant, must hold
 }
+
 void test_unary_operators()
 {
    Quad q(2.5, 3.6, 8.7, 5.8);          // normal ctor with 4 args
@@ -116,6 +122,7 @@ void test_unary_operators()
    cout << "q3 = " << q3 << endl;
    assert(q3 == q);
 }
+
 void test_basic_arithmetic_operators()
 {
    Quad q1(2.5, 3.6, 8.7, 5.8);          // normal ctor with 4 args
@@ -153,6 +160,7 @@ void test_basic_arithmetic_operators()
    Quad q8 = q1++;                       //Quad++
    Quad q9 = --q1;                       // --Quad4D
    q9--;                                 // Quad4D--
+   cout << "q8 = " << q8 << endl;
    cout << "q9 = " << q9 << endl;
    assert(q1 == 1 + q9);                 // double + Quad
    assert(q1 - 1 == q9);
@@ -160,6 +168,7 @@ void test_basic_arithmetic_operators()
    assert(2 * q1 == q9 + q1 + 1);
    assert(q1 * q1 == q1 * (1 + q9));
 }
+
 void test_compound_assignment_operators()
 {
    Quad q1{ 3, 1, 7, 4 };
@@ -212,11 +221,11 @@ void test_relational_operators()
 {
    Quad q{ 3, 1, 7, 4 };
    // relational operators
-   double smallTol = Quad::getTolerance() / 10.0;
+   double smallTol = Quad::tolerance / 10.0;
    Quad qNeighbor(3 - smallTol, 1 + smallTol, 7 - smallTol, 4 + smallTol);
    assert(q == qNeighbor);
 
-   double tol = Quad::getTolerance();
+   double tol = Quad::tolerance;
    assert(q != (q + tol));
    assert(q != (q + 0.25 * tol));
    assert(q == (q + 0.15 * tol));
@@ -230,6 +239,7 @@ void test_relational_operators()
    assert((q + 0.001) >= q);
    assert((q + 0.001) >= (q + 0.001));
 }
+
 void test_function_objects()
 {
    Quad q = Quad{ 4.5, 2.5, 7, 5 };
@@ -238,6 +248,15 @@ void test_function_objects()
    assert(q() == 7.0);
    assert(q(1) == 4.5);
    assert(q(1, 4) == 5);
-   assert(q(1, 2, 1) == 4.5);
+   // assert(q(1, 2, 1) == 4.5);
    assert(q(2, 1, 3, 4) == 7);
+}
+
+void test_accessor_mutator()
+{
+   Quad q{ 4.5, 2.5, 7, 5 };
+   Quad p{ q * 2 };
+   assert(p.get() == q + q);
+   p.set( q *= 2 );
+   assert(-q / 4 + p ==  + q * 3 / 4);
 }

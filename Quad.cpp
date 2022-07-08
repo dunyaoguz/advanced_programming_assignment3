@@ -1,8 +1,9 @@
 #include <array>
+#include <iomanip>
 #include "Quad.h"
 
 // default ctor
-Quad::Quad(double x1 = 0.0, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0)
+Quad::Quad(double x1, double x2, double x3, double x4)
 {
     quad.at(0) = x1;
     quad.at(1) = x2;
@@ -11,9 +12,9 @@ Quad::Quad(double x1 = 0.0, double x2 = 0.0, double x3 = 0.0, double x4 = 0.0)
 }
 
 // accessors and mutators
-static const double getTolerance()
+std::array<double, 4> Quad::getQuadArray() const
 {
-    return Quad::tolerance;
+    return quad;
 }
 
 void Quad::set(const Quad& someQuad)
@@ -22,6 +23,11 @@ void Quad::set(const Quad& someQuad)
     quad.at(1) = someQuad[2];
     quad.at(2) = someQuad[3];
     quad.at(3) = someQuad[4];
+}
+
+Quad Quad::get() const 
+{
+    return *this;
 }
 
 // compound assignment operators
@@ -52,10 +58,34 @@ Quad& Quad::operator*=(const Quad& someQuad)
     return *this;
 }
 
+// Quad Quad::inverse() const 
+// {
+//     Quad inversed = Quad(quad.at(2), -quad.at(1), quad.at(0), -quad.at(3));
+//     return inversed;
+// }
+
 Quad Quad::inverse() const 
 {
-    Quad inversed = Quad(quad.at(2), -quad.at(1), quad.at(0), -quad.at(3));
-    return inversed;
+   Quad x{ *this };
+   double beta = x[1] * x[3] - x[2] * x[4];
+   if (std::abs(beta) < DBL_EPSILON)
+   {
+      std::string xStr{ std::to_string(x[1]) + ", " + std::to_string(x[2]) + ", "
+                      + std::to_string(x[3]) + ", " + std::to_string(x[4]) };
+      throw std::domain_error("inverse of the Quad [" + xStr + "] is undefined");
+   }
+   return Quad(x[3] / beta, -x[2] / beta, x[1] / beta, -x[4] / beta);
+}
+
+Quad Quad::absoluteValue() const
+{
+    Quad newQuad = Quad(std::abs(quad.at(0)), std::abs(quad.at(1)), std::abs(quad.at(2)), std::abs(quad.at(3)));
+    return newQuad;
+}
+
+double Quad::sum() const 
+{
+    return std::abs(quad.at(0)) + std::abs(quad.at(1)) + std::abs(quad.at(2)) + std::abs(quad.at(3));
 }
 
 Quad& Quad::operator/=(const Quad& someQuad)
@@ -110,8 +140,9 @@ Quad& Quad::operator/=(const double& a)
 // unary increment and decrement overloads
 Quad Quad::operator-()
 {
-    Quad newQuad = *this *= -1.0;
-    return newQuad;
+    Quad temp{*this};
+    temp *= -1.0;
+    return temp;
 }
 
 Quad Quad::operator+()
@@ -179,36 +210,57 @@ double Quad::operator()() const
 
 double Quad::operator()(size_t i) const
 {
-    return quad.at(i);
+    if(i < 1 || i > 4) 
+    {
+        throw std::out_of_range("Error: index out of bounds");
+    }
+    else 
+    {
+        return quad.at(i-1);
+    }
 }
 
 double Quad::operator()(size_t i, size_t j) const
 {
-    if(quad.at(i) >= quad.at(j))
+    if(i < 1 || i > 4 || j < 1 || j > 4) 
     {
-        return quad.at(i);
+        throw std::out_of_range("Error: index out of bounds");
     }
-    return quad.at(j);
+    else 
+    {
+        if(quad.at(i-1) >= quad.at(j-1))
+        {
+            return quad.at(i-1);
+        }
+        return quad.at(j-1);
+    }
 }
 
 double Quad::operator()(size_t i, size_t j, size_t k) const
 {
-    std::array temp{quad.at(i), quad.at(j), quad.at(k)};
-    return *std::max_element(temp.begin(), temp.end());
+    if(i < 1 || i > 4 || j < 1 || j > 4 || k < 1 || k > 4) 
+    {
+        throw std::out_of_range("Error: index out of bounds");
+    }
+    else 
+    {
+        std::array temp{quad.at(i), quad.at(j), quad.at(k)};
+        return *std::max_element(temp.begin(), temp.end());
+    }
 }
 
 double Quad::operator()(size_t i, size_t j, size_t k, size_t l) const
 {
-    std::array temp{quad.at(i), quad.at(j), quad.at(k), quad.at(l)};
-    return *std::max_element(temp.begin(), temp.end());
+    if(i < 1 || i > 4 || j < 1 || j > 4 || k < 1 || k > 4 || l < 1 || l > 4) 
+    {
+        throw std::out_of_range("Error: index out of bounds");
+    }
+    else 
+    {
+        std::array temp{quad.at(i), quad.at(j), quad.at(k), quad.at(l)};
+        return *std::max_element(temp.begin(), temp.end());
+    }
 }
-
-Quad Quad::absoluteValue() const
-{
-    Quad newQuad = Quad(std::abs(quad.at(0)), std::abs(quad.at(1)), std::abs(quad.at(2)), std::abs(quad.at(3)));
-    return newQuad;
-}
-
 
 // basic arithmetic binary operators
 Quad operator+(const Quad& firstQuad, const Quad& secondQuad)
@@ -288,56 +340,90 @@ Quad operator/(const Quad& someQuad, const double& a)
 
 Quad operator+(const double& a, const Quad& someQuad)
 {
-    return someQuad + a;
+    double index1 = a + someQuad[1];
+    double index2 = a + someQuad[2];
+    double index3 = a + someQuad[3];
+    double index4 = a + someQuad[4];
+    return Quad(index1, index2, index3, index4);
 }
 
 Quad operator-(const double& a, const Quad& someQuad)
 {
-    return someQuad - a;
+    double index1 = a - someQuad[1];
+    double index2 = a - someQuad[2];
+    double index3 = a - someQuad[3];
+    double index4 = a - someQuad[4];
+    return Quad(index1, index2, index3, index4);
 }
 
 Quad operator*(const double& a, const Quad& someQuad)
 {
-    return someQuad * a;
+    double index1 = a * someQuad[1];
+    double index2 = a * someQuad[2];
+    double index3 = a * someQuad[3];
+    double index4 = a * someQuad[4];
+    return Quad(index1, index2, index3, index4);
 }
 
 Quad operator/(const double& a, const Quad& someQuad)
 {
-    return someQuad / a;
+    return a * someQuad.inverse();
 }
 
 // relational and equality operator overloads
-bool operator==(const Quad&, const Quad&)
-{
-
+bool operator==(const Quad& firstQuad, const Quad& secondQuad)
+{   
+    double diff = std::abs(firstQuad.sum() - secondQuad.sum());
+    return diff < Quad::tolerance;
 }
-bool operator!=(const Quad&, const Quad&)
-{
 
+bool operator!=(const Quad& firstQuad, const Quad& secondQuad)
+{
+    return firstQuad.sum() != secondQuad.sum();
 }
-bool operator<(const Quad&, const Quad&)
-{
 
+bool operator<(const Quad& firstQuad, const Quad& secondQuad)
+{
+    return firstQuad.sum() < secondQuad.sum();
 }
-bool operator<=(const Quad&, const Quad&)
-{
 
+bool operator<=(const Quad& firstQuad, const Quad& secondQuad)
+{
+    return firstQuad.sum() <= secondQuad.sum();
 }
-bool operator>(const Quad&, const Quad&)
-{
 
+bool operator>(const Quad& firstQuad, const Quad& secondQuad)
+{
+    return firstQuad.sum() > secondQuad.sum();
 }
-bool operator>=(const Quad&, const Quad&)
-{
 
+bool operator>=(const Quad& firstQuad, const Quad& secondQuad)
+{
+    return firstQuad.sum() >= secondQuad.sum();
 }
 
 // output and input stream overloads
-std::ostream &operator<<(std::ostream&, const Quad&)
+std::ostream &operator<<(std::ostream& output, const Quad& quadToPrint)
 {
-
+    output << std::fixed
+           << std::setprecision(2)
+           << "[" 
+           << quadToPrint[1] << ", " 
+           << quadToPrint[2] << ", " 
+           << quadToPrint[3] << ", " 
+           << quadToPrint[4] << "]";
+    return output;
 }
-std::istream &operator>>(std::istream&, Quad&)
-{
 
+std::istream &operator>>(std::istream& input, Quad& quadToInsert)
+{
+    double a, b, c, d;
+    if (input >> a >> b >> c >> d)
+    {
+        quadToInsert[1] = a;
+        quadToInsert[2] = b;
+        quadToInsert[3] = c;
+        quadToInsert[4] = d;
+    }
+    return input;
 }

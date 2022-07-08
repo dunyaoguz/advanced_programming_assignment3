@@ -2,6 +2,7 @@
 #define QUAD_H_
 #include <array>
 #include <iostream>
+#include <cfloat>
 
 class Quad
 {
@@ -20,7 +21,8 @@ class Quad
         ~Quad() = default;
         
         // accessors and mutators
-        static const double getTolerance();
+        std::array<double, 4> getQuadArray() const;
+        Quad get() const;
         void set(const Quad&);
 
         // compound assignment operators
@@ -55,6 +57,7 @@ class Quad
 
         Quad absoluteValue() const;
         Quad inverse() const;
+        double sum() const;
 
     private:
         std::array<double, 4> quad{};        
