@@ -26,7 +26,7 @@ void test_accessor_mutator();
 
 int main()
 {
-   // test_insersion_extraction_operator(); // success
+   test_insersion_extraction_operator(); // success
    test_constructors_and_equality(); // success
    test_multiplication_and_inverse(); // success
    test_unary_operators(); // success
@@ -248,7 +248,7 @@ void test_function_objects()
    assert(q() == 7.0);
    assert(q(1) == 4.5);
    assert(q(1, 4) == 5);
-   // assert(q(1, 2, 1) == 4.5);
+   assert(q(1, 2, 1) == 4.5);
    assert(q(2, 1, 3, 4) == 7);
 }
 

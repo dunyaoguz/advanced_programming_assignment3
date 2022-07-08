@@ -244,7 +244,7 @@ double Quad::operator()(size_t i, size_t j, size_t k) const
     }
     else 
     {
-        std::array temp{quad.at(i), quad.at(j), quad.at(k)};
+        std::array temp{quad.at(i-1), quad.at(j-1), quad.at(k-1)};
         return *std::max_element(temp.begin(), temp.end());
     }
 }
@@ -257,7 +257,7 @@ double Quad::operator()(size_t i, size_t j, size_t k, size_t l) const
     }
     else 
     {
-        std::array temp{quad.at(i), quad.at(j), quad.at(k), quad.at(l)};
+        std::array temp{quad.at(i-1), quad.at(j-1), quad.at(k-1), quad.at(l-1)};
         return *std::max_element(temp.begin(), temp.end());
     }
 }
